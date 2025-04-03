@@ -47,26 +47,20 @@ check_db() {
 
 
 create_boxer() {
-    id = $1
+    id=$1
     name=$2
     weight=$3
     height=$4
     reach=$5
     age=$6
 
-    echo "Creating boxer with id: $id, name: $name, weight: $weight, height: $height, reach: $reach, age: $age"
-    curl -s -X POST "$BASE_URL/boxers" \
+    echo "Creating boxer with id: $id, name: $name, weight: $weight, height: $height, reach: $reach, age: $age."
+    add_response=$(curl -s -X POST "$BASE_URL/add-boxer" \
         -H "Content-Type: application/json" \
-        -d '{
-            "id": "'"$id"'",
-            "name": "'"$name"'",
-            "weight": '"$weight"',
-            "height": '"$height"',
-            "reach": '"$reach"',
-            "age": '"$age"'
-        }' | grep -q '"status": "success"'
+        -d "{\"name\": \"$name\", \"weight\": $weight, \"height\": $height, \"reach\": $reach, \"age\": $age}")
 
-    if [ $? -eq 0 ]; then   
+    echo $add_response
+    if echo "$add_response" | grep -q '"status": "success"'; then   
         echo "Boxer created successfully."
     else
         echo "Failed to create boxer."
@@ -78,8 +72,8 @@ delete_boxer() {
     boxer_id=$1
 
     echo "Deleting boxer with ID: $boxer_id"
-    response=$(curl -s -X DELETE "$BASE_URL/boxers/$boxer_id")
-    if echo "$response" | grep -q '"status": "success"'; then
+    delete_response=$(curl -s -X DELETE "$BASE_URL/delete-boxer/$boxer_id")
+    if echo "$delete_response" | grep -q '"status": "success"'; then
         echo "Boxer deleted successfully."
     else
         echo "Failed to delete boxer."
@@ -105,7 +99,8 @@ get_boxer_by_id() {
     boxer_id=$1
 
     echo "Fetching boxer with ID: $boxer_id"
-    response=$(curl -s -X GET "$BASE_URL/boxers/$boxer_id")
+    response=$(curl -s -X GET "$BASE_URL/get-boxer-by-id/$boxer_id")
+    echo $response
     if echo "$response" | grep -q '"status": "success"'; then
         echo "Boxer retrieved successfully by ID ($boxer_id)."
         if [ "$ECHO_JSON" = true ]; then
@@ -122,7 +117,8 @@ get_boxer_by_name() {
     boxer_name=$1
 
     echo "Fetching boxer with name: $boxer_name"
-    response=$(curl -s -X GET "$BASE_URL/boxers?name=$boxer_name")
+    response=$(curl -s -X GET "$BASE_URL/api/get-boxer-by-name/$boxer_name")
+    echo $response
     if echo "$response" | grep -q '"status": "success"'; then
         echo "Boxer retrieved successfully by name ($boxer_name)."
         if [ "$ECHO_JSON" = true ]; then
@@ -131,22 +127,6 @@ get_boxer_by_name() {
         fi
     else
         echo "Failed to fetch boxer."
-        exit 1
-    fi
-}
-
-get_weight_class() {
-    echo "Fetching weight class..."
-    response=$(curl -s -X GET "$BASE_URL/get-weight-class")
-
-    if echo "$response" | grep -q '"status": "success"'; then
-        echo "Weight class retrieved successfully."
-        if [ "$ECHO_JSON" = true ]; then
-            echo "Weight class JSON:"
-            echo "$response"| jq .
-        fi
-    else
-        echo "Failed to fetch weight class."
         exit 1
     fi
 }
@@ -183,10 +163,13 @@ clear_ring() {
 }
 
 enter_ring() {
-    boxer_id=$1
+    boxer_name=$1
 
-    echo "Entering ring with boxer ID: $boxer_id"
-    response=$(curl -s -X POST "$BASE_URL/enter-ring/$boxer_id")
+    echo "Entering ring with boxer name: $boxer_name"
+
+    response=$(curl -s -X POST "$BASE_URL/enter-ring/$boxer_name")
+
+    echo $response
 
     if echo "$response" | grep -q '"status": "success"'; then
         echo "Boxer entered the ring successfully."
@@ -221,22 +204,25 @@ check_db
 
 
 # Create boxers
-create_boxer "Boxer 1" 180 75 10.0 25
-create_boxer "Boxer 2" 175 70 9.5 30
-create_boxer "Boxer 3" 185 80 11.0 28
-create_boxer "Boxer 4" 170 65 8.5 22
+create_boxer 1 "Boxer 11" 180 75 10.0 25
+create_boxer 2 "Boxer 12" 175 70 9.5 30
+create_boxer 3 "Boxer 13" 185 80 11.0 28
+create_boxer 4 "Boxer 14" 170 65 8.5 22
 
-delete_boxer 4
+delete_boxer 3
+delete_boxer 1
 
-get_boxer_by_id 1
+
 get_boxer_by_name "Boxer 2"
+get_boxer_by_id 1
 
-get_weight_class 130
 
 enter_ring 1
 enter_ring 2
 
 get_boxers
+
+
 
 fight
 
