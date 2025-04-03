@@ -38,10 +38,10 @@ class RingModel:
         """
         if len(self.ring) < 2:
             logger.error("Not enough boxers in the ring to start a fight.")
-            raise ValueError("There must be two boxers to start a fight.")
+            raise ValueError("Not enough boxers in the ring to start a fight.")
         
         if len(self.ring) > 2:
-            logger.error("Too many boxers in the ring.")
+            logger.error("There are too many boxers in the ring.")
             raise ValueError("There are too many boxers in the ring.")
         
         logger.info("Starting a fight between two boxers.")
@@ -162,11 +162,11 @@ class RingModel:
 
         """
 
-        logger.info(f"Calculating fighting skill for boxer: {boxer.name}")
-
         if not isinstance(boxer, Boxer):
             logger.error("Invalid type: boxer is not a valid Boxer instance.")
             raise TypeError(f"Invalid type: Expected 'Boxer', got '{type(boxer).__name__}'")
+
+        logger.info(f"Calculating fighting skill for boxer: {boxer.name}")
         
         # Arbitrary calculations
         age_modifier = -1 if boxer.age < 25 else (-2 if boxer.age > 35 else 0)

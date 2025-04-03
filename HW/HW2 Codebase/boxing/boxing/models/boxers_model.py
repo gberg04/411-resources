@@ -72,7 +72,7 @@ def create_boxer(name: str, weight: int, height: int, reach: float, age: int) ->
     if not isinstance(reach, float) or reach <= 0:
         logger.warning(f"Invalid reach provided: {reach}.")
         raise ValueError(f"Invalid reach: {reach}. Must be greater than 0.")
-    if not isinstance(age, int) or (18 <= age <= 40):
+    if not isinstance(age, int) or not (18 <= age <= 40):
         logger.warning(f"Invalid age provided: {age}.")
         raise ValueError(f"Invalid age: {age}. Must be between 18 and 40.")
 
@@ -141,6 +141,10 @@ def delete_boxer(boxer_id: int) -> None:
 
 def get_leaderboard(sort_by: str = "wins") -> List[dict[str, Any]]:
     """Returns a leaderboard of all boxers sorted by wins.
+
+    Args:
+        sort_by (str): The field to sort by. Can be 'wins' or 'win_pct'.
+            Defaults to 'wins'.
 
     Returns:
         List[dict[str, Any]]: A list of all boxers and their info sorted by wins.
@@ -332,7 +336,7 @@ def get_weight_class(weight: int) -> str:
 
 
 def update_boxer_stats(boxer_id: int, result: str) -> None:
-    """Sets the current track number to the specified track number.
+    """Updates the stats of a boxer after a fight.
 
     Args:
         boxer_id (int): The ID of the boxer to update.
